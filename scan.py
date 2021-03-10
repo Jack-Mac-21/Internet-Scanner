@@ -21,12 +21,12 @@ class Scanner:
         dns_resolvers = ["208.67.222.222", "1.1.1.1", "8.8.8.8", "8.26.56.26",  "9.9.9.9",
                          "64.6.65.6", "91.239.100.100", "185.228.168.168", "77.88.8.7",
                          "156.154.70.1", "198.101.242.72", "176.103.130.130"]
-        print(dns_resolvers)
         return dns_resolvers
 
     def scan(self):
         self.add_scan_time()
         self.add_ip4()
+        self.add_ip6()
 
         json_dict = json.dumps(self.output, sort_keys=True, indent=4)
         print(json_dict)
@@ -46,7 +46,7 @@ class Scanner:
             for resolver in self.dns_resolvers:
                 try:
                     command_result = subprocess.check_output(["nslookup", "-type=A", site, resolver],
-                                                             timeout=2, stderr=subprocess.STDOUT).decode("utf-8")
+                                                             timeout=1, stderr=subprocess.STDOUT).decode("utf-8")
                 except:
                     command_result = "Error occurred"
 
@@ -62,6 +62,30 @@ class Scanner:
             site_dict.update({key: address_list})
             self.output.update({site: site_dict})
 
+    def add_ip6(self):  # adds the ip6 address to each sites dictionary, identical to ip4 implementation
+        for site in self.websites:
+            site_dict = self.output.get(site)
+            key = "ipv6_addresses"
+            address_list = []
+
+            for resolver in self.dns_resolvers:
+                try:
+                    command_result = subprocess.check_output(["nslookup", "-type=AAAA", site, resolver],
+                                                             timeout=1, stderr=subprocess.STDOUT).decode("utf-8")
+                except:
+                    command_result = "Error occurred"
+
+                if command_result != "Error occurred":
+                    command_result = command_result.splitlines(True)
+                    for string in command_result:
+                        if string[0] == "A" and string != command_result[1]:
+                            string = string[9:].rstrip()
+                            if string not in address_list and string != "":
+                                string = string.rstrip()
+                                address_list.append(string)
+
+            site_dict.update({key: address_list})
+            self.output.update({site: site_dict})
 
 
 # Takes the given command line input and reads it, modifies it and passes it to scanner
