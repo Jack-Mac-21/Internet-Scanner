@@ -24,10 +24,10 @@ class Scanner:
         return dns_resolvers
 
     def scan(self):
+        self.add_scan_time()
         self.add_ip6()
         self.add_ip4()
-        self.add_scan_time()
-        self.add_ip4()
+
 
 
         json_dict = json.dumps(self.output, sort_keys=True, indent=4)
