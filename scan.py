@@ -53,7 +53,7 @@ class Scanner:
                 if command_result != "Error occurred":
                     command_result = command_result.splitlines(True)
                     for string in command_result:
-                        if string[0] == "A":
+                        if string[0] == "A" and string != command_result[0]:
                             string = string[9:].rstrip()
                             if string not in address_list and string != "":
                                 string = string.rstrip()
