@@ -3,10 +3,11 @@
 
 import sys
 import os
+import subprocess
 import time
 import json
 
-output_dictionary = {}  # JSON dictionary as output where website is the key and dictionary of results is the value
+
 
 
 # Scanner takes a list of websites
@@ -14,19 +15,57 @@ class Scanner:
     def __init__(self, input_txt):
         self.websites = input_txt
         self.output = {}
+        self.dns_resolvers = self.initialize_resolvers()  # List of all public DNS resolvers (hard coded in)
+
+    def initialize_resolvers(self):
+        dns_resolvers = ["208.67.222.222", "1.1.1.1", "8.8.8.8", "8.26.56.26",  "9.9.9.9",
+                         "64.6.65.6", "91.239.100.100", "185.228.168.168", "77.88.8.7",
+                         "156.154.70.1", "198.101.242.72", "176.103.130.130"]
+        print(dns_resolvers)
+        return dns_resolvers
 
     def scan(self):
-        for site in self.websites:
-            key = site
-            value = {"scan-time: ": time.time()}
-            self.output.update({key: value})
+        self.add_scan_time()
+        self.add_ip4()
 
         json_dict = json.dumps(self.output, sort_keys=True, indent=4)
         print(json_dict)
 
+    def add_scan_time(self):  # Acts to initialize the dictionary, with sites as keys and dict with scan time as value
+        for site in self.websites:
+            key = site
+            value = {"scan-time": time.time()}
+            self.output.update({key: value})
 
-# Takes the given input and reads it, modifies it and passes it to scanner
-def main():
+    def add_ip4(self):  # adds the ip4 address to each sites dictionary
+        for site in self.websites:
+            site_dict = self.output.get(site)
+            key = "ipv4_addresses"
+            address_list = []
+
+            for resolver in self.dns_resolvers:
+                try:
+                    command_result = subprocess.check_output(["nslookup", "-type=A", site, resolver],
+                                                             timeout=2, stderr=subprocess.STDOUT).decode("utf-8")
+                except:
+                    command_result = "Error occurred"
+
+                if command_result != "Error occurred":
+                    command_result = command_result.split("Address")[2]
+                    command_result = command_result.split(" ")
+                    command_result = command_result[1:]
+                    for string in command_result:
+                        if string not in address_list and string != "":
+                            string = string.rstrip()
+                            address_list.append(string)
+
+            site_dict.update({key: address_list})
+            self.output.update({site: site_dict})
+
+
+
+# Takes the given command line input and reads it, modifies it and passes it to scanner
+def parse_input():
     input_txt = sys.argv[1]
     with open(input_txt, 'r') as file:
         data = file.readlines()
@@ -39,6 +78,6 @@ def main():
     scanner.scan()
 
 
-main()
+parse_input()
 
 #  cd Documents/NU/networking/projects/pr4
