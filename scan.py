@@ -51,13 +51,13 @@ class Scanner:
                     command_result = "Error occurred"
 
                 if command_result != "Error occurred":
-                    command_result = command_result.split("Address")[2]
-                    command_result = command_result.split(" ")
-                    command_result = command_result[1:]
+                    command_result = command_result.splitlines(True)
                     for string in command_result:
-                        if string not in address_list and string != "":
-                            string = string.rstrip()
-                            address_list.append(string)
+                        if string[0] == "A":
+                            string = string[9:].rstrip()
+                            if string not in address_list and string != "":
+                                string = string.rstrip()
+                                address_list.append(string)
 
             site_dict.update({key: address_list})
             self.output.update({site: site_dict})
