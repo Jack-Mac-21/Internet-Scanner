@@ -22,6 +22,7 @@ def main():
 
     json_dict = json.dumps(output_dictionary, sort_keys=True, indent=4)
     print(json_dict)
+    print("\n\n\nI made a change!")
 
 
 
