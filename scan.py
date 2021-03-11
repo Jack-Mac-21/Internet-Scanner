@@ -94,8 +94,8 @@ class Scanner:
     def add_server(self):  # Uses curl to get an http response and records the server
         for site in self.websites:
             site_dict = self.output.get(site)
-            key = "server"
-            server = None
+            key_server = "server"
+            server_value = None
 
             try:
                 curl_result = subprocess.check_output(["curl", "-I", site], timeout=1,
@@ -107,9 +107,9 @@ class Scanner:
                 curl_result = curl_result.splitlines()
                 for line in curl_result:
                     if line[:7] == "Server:":
-                        server = line[8:].rstrip()
+                        server_value = line[8:].rstrip()
 
-            site_dict.update({key: server})
+            site_dict.update({key_server: server_value})
             self.output.update({site: site_dict})
 
 # Takes the given command line input and reads it, modifies it and passes it to scanner
