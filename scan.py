@@ -114,7 +114,8 @@ class Scanner:
                 for line in curl_result:
                     if line[:7] == "Server:":
                         server_value = line[8:].rstrip()
-
+            print("\n" + site + "curl result... ")
+            print(curl_result)
             value_https_redirect = self.http_redirect(curl_result)
             site_dict.update({key_server: server_value})  # server
             site_dict.update({key_http_insecure: http_unencrypted})  # http listen
@@ -131,27 +132,36 @@ class Scanner:
         if curl_result != "Error":
             location_redirect = None
             for line in curl_result:
-                if line[:9] == "Location:":
+                if line[:9] == "Location:" or line[:9] == "location:":
                     location_redirect = line[10:]
             if location_redirect is not None:
+                print("\n" + location_redirect + "\n")
                 if location_redirect[:6] == "https:":
                     value_redirect = True
                     self.redirect_count = 0
                     return value_redirect
                 else:
                     try:
+                        print("tried a redirect")
                         curl_result = subprocess.check_output(["curl", "-I", location_redirect], timeout=1,
                                                               stderr=subprocess.STDOUT).decode("utf-8")
                         curl_result = curl_result.splitlines()
                     except Exception:
                         curl_result = "Error"
+
+                    print(curl_result)
+                    print('\n\n')
                     self.redirect_count += 1
                     self.http_redirect(curl_result)
+            else:
+                self.redirect_count = 0
+                return False
         else:
             self.redirect_count = 0
             return value_redirect
 
-        return "Made it through function"
+        self.redirect_count =0
+        return False
 
 # Takes the given command line input and reads it, modifies it and passes it to scanner
 def parse_input():
