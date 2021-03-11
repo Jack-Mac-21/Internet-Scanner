@@ -6,6 +6,7 @@ import os
 import subprocess
 import time
 import json
+import http.client
 
 
 
@@ -25,6 +26,7 @@ class Scanner:
 
     def scan(self):
         self.add_scan_time()
+        self.add_server()
         self.add_ip6()
         self.add_ip4()
 
@@ -89,6 +91,26 @@ class Scanner:
             site_dict.update({key: address_list})
             self.output.update({site: site_dict})
 
+    def add_server(self):  # Uses curl to get an http response and records the server
+        for site in self.websites:
+            site_dict = self.output.get(site)
+            key = "server"
+            server = None
+
+            try:
+                curl_result = subprocess.check_output(["curl", "-I", site], timeout=1,
+                                                      stderr=subprocess.STDOUT).decode("utf-8")
+            except:
+                curl_result = "Error"
+
+            if curl_result != "Error":  # Goes through the lines of the curl response and sees if there is a server header
+                curl_result = curl_result.splitlines()
+                for line in curl_result:
+                    if line[:7] == "Server:":
+                        server = line[8:].rstrip()
+
+            site_dict.update({key: server})
+            self.output.update({site: site_dict})
 
 # Takes the given command line input and reads it, modifies it and passes it to scanner
 def parse_input():
