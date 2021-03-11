@@ -18,6 +18,7 @@ class Scanner:
         self.output = {}
         self.dns_resolvers = self.initialize_resolvers()  # List of all public DNS resolvers (hard coded in)
         self.unencrypted_listen = False  # Does the site listen to unencrypted http request on port 80
+        self.redirect_count = 0  # Handling redirects for finding if it redirects to https
 
     def initialize_resolvers(self):
         dns_resolvers = ["208.67.222.222", "1.1.1.1", "8.8.8.8", "8.26.56.26",  "9.9.9.9",
@@ -92,11 +93,12 @@ class Scanner:
             site_dict.update({key: address_list})
             self.output.update({site: site_dict})
 
-    def add_server(self):  # Uses curl to get an http response and records the server
+    def add_server(self):  # Uses curl to get an http response and records the server, also handles https redirect portion
         for site in self.websites:
             site_dict = self.output.get(site)
             key_server = "server"
-            key_http_listen = "insecure-http"
+            key_http_insecure = "insecure-http"
+            key_https_redirect = "redirect-to-https:"
             server_value = None
             http_unencrypted = False
 
@@ -113,12 +115,43 @@ class Scanner:
                     if line[:7] == "Server:":
                         server_value = line[8:].rstrip()
 
-            site_dict.update({key_server: server_value})
-            site_dict.update({key_http_listen: http_unencrypted})
+            value_https_redirect = self.http_redirect(curl_result)
+            site_dict.update({key_server: server_value})  # server
+            site_dict.update({key_http_insecure: http_unencrypted})  # http listen
+            site_dict.update({key_https_redirect: value_https_redirect})  # https redirect
             self.output.update({site: site_dict})
 
-    def http_redirect(self):  # Returns sets the redirect portion for each site
-        pass
+    def http_redirect(self, curl_result):  # Returns sets the redirect portion for each site
+        value_redirect = False
+
+        if self.redirect_count >= 10:
+            self.redirect_count = 0
+            return "Too Many Redirects"
+
+        if curl_result != "Error":
+            location_redirect = None
+            for line in curl_result:
+                if line[:9] == "Location:":
+                    location_redirect = line[10:]
+            if location_redirect is not None:
+                if location_redirect[:6] == "https:":
+                    value_redirect = True
+                    self.redirect_count = 0
+                    return value_redirect
+                else:
+                    try:
+                        curl_result = subprocess.check_output(["curl", "-I", location_redirect], timeout=1,
+                                                              stderr=subprocess.STDOUT).decode("utf-8")
+                        curl_result = curl_result.splitlines()
+                    except Exception:
+                        curl_result = "Error"
+                    self.redirect_count += 1
+                    self.http_redirect(curl_result)
+        else:
+            self.redirect_count = 0
+            return value_redirect
+
+        return "Made it through function"
 
 # Takes the given command line input and reads it, modifies it and passes it to scanner
 def parse_input():
