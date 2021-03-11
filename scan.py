@@ -17,6 +17,7 @@ class Scanner:
         self.websites = input_txt
         self.output = {}
         self.dns_resolvers = self.initialize_resolvers()  # List of all public DNS resolvers (hard coded in)
+        self.unencrypted_listen = False  # Does the site listen to unencrypted http request on port 80
 
     def initialize_resolvers(self):
         dns_resolvers = ["208.67.222.222", "1.1.1.1", "8.8.8.8", "8.26.56.26",  "9.9.9.9",
@@ -95,22 +96,29 @@ class Scanner:
         for site in self.websites:
             site_dict = self.output.get(site)
             key_server = "server"
+            key_http_listen = "insecure-http"
             server_value = None
+            http_unencrypted = False
 
             try:
-                curl_result = subprocess.check_output(["curl", "-I", site], timeout=1,
+                curl_result = subprocess.check_output(["curl", "-I", site+":80"], timeout=1,
                                                       stderr=subprocess.STDOUT).decode("utf-8")
-            except:
+            except Exception:
                 curl_result = "Error"
 
             if curl_result != "Error":  # Goes through the lines of the curl response and sees if there is a server header
                 curl_result = curl_result.splitlines()
+                http_unencrypted = True
                 for line in curl_result:
                     if line[:7] == "Server:":
                         server_value = line[8:].rstrip()
 
             site_dict.update({key_server: server_value})
+            site_dict.update({key_http_listen: http_unencrypted})
             self.output.update({site: site_dict})
+
+    def http_redirect(self):  # Returns sets the redirect portion for each site
+        pass
 
 # Takes the given command line input and reads it, modifies it and passes it to scanner
 def parse_input():
