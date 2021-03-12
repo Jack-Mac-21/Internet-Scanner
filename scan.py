@@ -255,9 +255,9 @@ class Scanner:
             try:
                 ssl_result = subprocess.check_output(ssl_request, timeout=20, stderr=subprocess.STDOUT).decode("utf-8")
             except Exception:
-                ssl_result = "\nError\n"
+                ssl_result = "Error\n"
+            print("Going through ssl_result: " + ssl_result)
             ssl_result = ssl_result.splitlines()
-            print("Going through ssl_result")
             for line in ssl_result:
                 line = line.strip()
                 print("Current line: " + line + "\n")
