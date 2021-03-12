@@ -20,7 +20,8 @@ class Scanner:
         self.unencrypted_listen = False  # Does the site listen to unencrypted http request on port 80
         self.redirect_count = 0  # Handling redirects for finding if it redirects to https
 
-    def initialize_resolvers(self):
+    @staticmethod
+    def initialize_resolvers():
         dns_resolvers = ["208.67.222.222", "1.1.1.1", "8.8.8.8", "8.26.56.26",  "9.9.9.9",
                          "64.6.65.6", "91.239.100.100", "185.228.168.168", "77.88.8.7",
                          "156.154.70.1", "198.101.242.72", "176.103.130.130"]
@@ -28,9 +29,13 @@ class Scanner:
 
     def scan(self):
         self.add_scan_time()
+        print("\n\nADDED SCAN_TIME\n\n")
         self.add_server()
+        print("\n\nADDED HTTP HEADERS\n\n")
         self.add_ip6()
+        print("\n\nADDED IP6\n\n")
         self.add_ip4()
+        print("\n\nADDED ADDED IP4\n\n")
 
 
 
@@ -93,12 +98,14 @@ class Scanner:
             site_dict.update({key: address_list})
             self.output.update({site: site_dict})
 
+    # Does all http header checks
     def add_server(self):  # Uses curl to get an http response and records the server, also handles https redirect portion
         for site in self.websites:
             site_dict = self.output.get(site)
             key_server = "server"
             key_http_insecure = "insecure-http"
             key_https_redirect = "redirect-to-https:"
+            key_hsts = "hsts"
             server_value = None
             http_unencrypted = False
 
@@ -114,14 +121,17 @@ class Scanner:
                 for line in curl_result:
                     if line[:7] == "Server:":
                         server_value = line[8:].rstrip()
-            print("\n" + site + "curl result... ")
-            print(curl_result)
+            #print("\n" + site + "curl result... ")
+            #print(curl_result)
             value_https_redirect = self.http_redirect(curl_result)
+            value_hsts = self.check_hsts(curl_result)
             site_dict.update({key_server: server_value})  # server
             site_dict.update({key_http_insecure: http_unencrypted})  # http listen
             site_dict.update({key_https_redirect: value_https_redirect})  # https redirect
+            site_dict.update({key_hsts: value_hsts})  # hsts header bool
             self.output.update({site: site_dict})
 
+    # Checks if redirected to https
     def http_redirect(self, curl_result):  # Returns sets the redirect portion for each site
         value_redirect = False
 
@@ -135,22 +145,22 @@ class Scanner:
                 if line[:9] == "Location:" or line[:9] == "location:":
                     location_redirect = line[10:]
             if location_redirect is not None:
-                print("\n" + location_redirect + "\n")
+                #print("\n" + location_redirect + "\n")
                 if location_redirect[:6] == "https:":
                     value_redirect = True
                     self.redirect_count = 0
                     return value_redirect
                 else:
                     try:
-                        print("tried a redirect")
+                        #print("tried a redirect")
                         curl_result = subprocess.check_output(["curl", "-I", location_redirect], timeout=1,
                                                               stderr=subprocess.STDOUT).decode("utf-8")
                         curl_result = curl_result.splitlines()
                     except Exception:
                         curl_result = "Error"
 
-                    print(curl_result)
-                    print('\n\n')
+                    #print(curl_result)
+                    #print('\n\n')
                     self.redirect_count += 1
                     self.http_redirect(curl_result)
             else:
@@ -162,6 +172,53 @@ class Scanner:
 
         self.redirect_count =0
         return False
+
+    # Chackes if redirected to page with strict-transport protocol
+    def check_hsts(self, input_curl):
+        curl_result = input_curl
+        header1 = "Strict-Transport-Security:"
+        header2 = "strict-transport-security:"
+        final_page = False  # Says if we reached last redirect or not
+
+        if curl_result == "Error":
+            print("curl ERROR1")
+            return False
+
+        while not final_page:  # Loop should find the final page and return it as curl_result
+            if self.redirect_count >= 9:
+                print("Too many redirects")
+                break
+            location_redirect = None
+            for line in curl_result:
+                if line[:9] == "Location:" or line[:9] == "location":
+                    location_redirect = line[10:]
+            if location_redirect is None:
+                final_page = True
+                print("Final page found")
+                break
+            else:
+                try:
+                    print("Trying a redirect")
+                    curl_result = subprocess.check_output(["curl", "-I", location_redirect], timeout=1,
+                                                              stderr=subprocess.STDOUT).decode("utf-8")
+                    curl_result = curl_result.splitlines()
+                except Exception:
+                    curl_result = "Error"
+            self.redirect_count += 1
+
+        self.redirect_count = 0
+
+        if curl_result == "Error":
+            print("curl ERROR2")
+            return False
+
+        for line in curl_result:
+            if line[:26] == header1 or line[:26] == header2:
+                print("hsts was found")
+                return True
+        print("Reached the end hst header was not found")
+        return False
+
 
 # Takes the given command line input and reads it, modifies it and passes it to scanner
 def parse_input():
