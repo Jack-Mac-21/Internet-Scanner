@@ -30,12 +30,15 @@ class Scanner:
     def scan(self):
         self.add_scan_time()
         print("\n\nADDED SCAN_TIME\n\n")
+        self.add_tls()
+        print("\n\nADDED TLS\n\n")
         self.add_server()
         print("\n\nADDED HTTP HEADERS\n\n")
         self.add_ip6()
         print("\n\nADDED IP6\n\n")
         self.add_ip4()
         print("\n\nADDED ADDED IP4\n\n")
+
 
 
 
@@ -181,12 +184,12 @@ class Scanner:
         final_page = False  # Says if we reached last redirect or not
 
         if curl_result == "Error":
-            print("curl ERROR1")
+            #print("curl ERROR1")
             return False
 
         while not final_page:  # Loop should find the final page and return it as curl_result
             if self.redirect_count >= 9:
-                print("Too many redirects")
+                #print("Too many redirects")
                 break
             location_redirect = None
             for line in curl_result:
@@ -194,11 +197,11 @@ class Scanner:
                     location_redirect = line[10:]
             if location_redirect is None:
                 final_page = True
-                print("Final page found")
+                #print("Final page found")
                 break
             else:
                 try:
-                    print("Trying a redirect")
+                    #print("Trying a redirect")
                     curl_result = subprocess.check_output(["curl", "-I", location_redirect], timeout=1,
                                                               stderr=subprocess.STDOUT).decode("utf-8")
                     curl_result = curl_result.splitlines()
@@ -209,15 +212,63 @@ class Scanner:
         self.redirect_count = 0
 
         if curl_result == "Error":
-            print("curl ERROR2")
+            #print("curl ERROR2")
             return False
 
         for line in curl_result:
             if line[:26] == header1 or line[:26] == header2:
-                print("hsts was found")
+                #print("hsts was found")
                 return True
-        print("Reached the end hst header was not found")
+        #print("Reached the end hst header was not found")
         return False
+
+    # Uses nmap for each website
+    # TODO: check for an error in nmap result
+    def add_tls(self):
+        tls_key = "tls_versions"
+        possible_tls = ["SSLv2:", "SSLv3:", "TLSv1.0:", "TLSv1.1:", "TLSv1.2:", "TLSv1.3"]
+        for site in self.websites:
+            tls_list = []
+            nmap_request = ["nmap", "--script", "ssl-enum-ciphers", "-p", "443", site]
+            ssl_request = ["echo", "|", "openssl", "s_client", "-tls1_3", "-connect", site + ":443"]
+            site_dict = self.output.get(site)
+
+            # First checking for the first 3 versions of tls
+            print("Getting nmap result")
+            try:
+                nmap_result = subprocess.check_output(nmap_request, timeout=20, stderr=subprocess.STDOUT).decode("utf-8")
+            except Exception:
+                nmap_result = "\n"
+            nmap_result = nmap_result.splitlines()
+            print("Going through nmap result")
+            for line in nmap_result:
+                line = line.strip("| ")
+                print(line)
+                if line in possible_tls:
+                    if line not in tls_list:
+                        tls_list.append(line[:-1])
+                        print("Added TLS version to output list")
+
+            # Second, check for TLSv1.3
+            print("Now checking for TLSv1.3 for: " + site)
+            print(ssl_request)
+            try:
+                ssl_result = subprocess.check_output(ssl_request, shell=True, timeout=20, stderr=subprocess.STDOUT).decode("utf-8")
+            except Exception:
+                ssl_result = "\n"
+            ssl_result = ssl_result.splitlines()
+            print("Going through ssl_result")
+            for line in ssl_result:
+                line = line.strip()
+                print("Current line: " + line)
+                if line[:12] == "New, TLSv1.3":
+                    if "TLSv1.3" not in tls_list:
+                        tls_list.append("TLSv1.3")
+                        print("Appending TLSv1.3")
+                        break
+
+            print("Updating site dictionary")
+            site_dict.update({tls_key: tls_list})
 
 
 # Takes the given command line input and reads it, modifies it and passes it to scanner
