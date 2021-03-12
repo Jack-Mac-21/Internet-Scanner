@@ -230,7 +230,7 @@ class Scanner:
         for site in self.websites:
             tls_list = []
             nmap_request = ["nmap", "--script", "ssl-enum-ciphers", "-p", "443", site]
-            ssl_request = ["echo", "|", "openssl", "s_client", "-tls1_3", "-connect", site + ":443"]
+            ssl_request = ["openssl", "s_client", "-tls1_3", "-connect", site + ":443"]
             site_dict = self.output.get(site)
 
             # First checking for the first 3 versions of tls
@@ -253,8 +253,11 @@ class Scanner:
             print("Now checking for TLSv1.3 for: " + site)
             #print(ssl_request)
             try:
-                ssl_result = subprocess.check_output(ssl_request, timeout=20, stderr=subprocess.STDOUT).decode("utf-8")
+                ps = subprocess.Popen(["echo"], stdout=subprocess.PIPE)
+                ssl_result = subprocess.check_output(ssl_request, stdin=ps.stdout, timeout=20, stderr=subprocess.STDOUT).decode("utf-8")
+                ps.wait()
             except Exception:
+                print(Exception.__cause__)
                 ssl_result = "Error\n"
             print("Going through ssl_result: " + ssl_result)
             ssl_result = ssl_result.splitlines()
