@@ -238,36 +238,36 @@ class Scanner:
             try:
                 nmap_result = subprocess.check_output(nmap_request, timeout=20, stderr=subprocess.STDOUT).decode("utf-8")
             except Exception:
-                nmap_result = "\n"
+                nmap_result = "Error\n"
             nmap_result = nmap_result.splitlines()
             print("Going through nmap result")
             for line in nmap_result:
                 line = line.strip("| ")
-                print(line)
+                #print(line)
                 if line in possible_tls:
                     if line not in tls_list:
                         tls_list.append(line[:-1])
-                        print("Added TLS version to output list")
+                        #print("Added TLS version to output list")
 
             # Second, check for TLSv1.3
             print("Now checking for TLSv1.3 for: " + site)
-            print(ssl_request)
+            #print(ssl_request)
             try:
                 ssl_result = subprocess.check_output(ssl_request, shell=True, timeout=20, stderr=subprocess.STDOUT).decode("utf-8")
             except Exception:
-                ssl_result = "\n"
+                ssl_result = "Error\n"
             ssl_result = ssl_result.splitlines()
             print("Going through ssl_result")
             for line in ssl_result:
                 line = line.strip()
-                print("Current line: " + line)
+                print("Current line: " + line + "\n")
                 if line[:12] == "New, TLSv1.3":
                     if "TLSv1.3" not in tls_list:
                         tls_list.append("TLSv1.3")
-                        print("Appending TLSv1.3")
+                        print("Appending TLSv1.3 for: " + site)
                         break
 
-            print("Updating site dictionary")
+            print("\nUpdating site dictionary for " + site + "\n")
             site_dict.update({tls_key: tls_list})
 
 
