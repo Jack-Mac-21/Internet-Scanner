@@ -253,9 +253,9 @@ class Scanner:
             print("Now checking for TLSv1.3 for: " + site)
             #print(ssl_request)
             try:
-                ssl_result = subprocess.check_output(ssl_request, shell=True, timeout=20, stderr=subprocess.STDOUT).decode("utf-8")
+                ssl_result = subprocess.check_output(ssl_request, timeout=20, stderr=subprocess.STDOUT).decode("utf-8")
             except Exception:
-                ssl_result = "Error\n"
+                ssl_result = "\nError\n"
             ssl_result = ssl_result.splitlines()
             print("Going through ssl_result")
             for line in ssl_result:
