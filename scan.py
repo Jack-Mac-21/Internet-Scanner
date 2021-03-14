@@ -295,7 +295,18 @@ class Scanner:
                 certificate_chain = [line.strip() for line in certificate_chain]
                 for line in certificate_chain:
                     line = line.strip()
-                print(certificate_chain)
+                cc_last_line = certificate_chain[-1].splitlines()
+                print(cc_last_line)
+                for entry in cc_last_line:
+                    if entry[:6] == "i:o = ":
+                        root_ca = entry[6:]
+                        print("Found root CA")
+                        break
+                    if entry[:3] == "O = ":
+                        root_ca = entry[3:]
+                        print("Found Root CA")
+                        break
+                print("Root CA for " + site + ": " + root_ca)
 
 
 # Takes the given command line input and reads it, modifies it and passes it to scanner
