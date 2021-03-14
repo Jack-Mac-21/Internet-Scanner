@@ -308,7 +308,7 @@ class Scanner:
                         root_ca = entry[3:]
                         print("Found Root CA")
                         break
-                print("Root CA for " + site + ": " + root_ca)
+                print("Root CA for " + site + ": " + str(root_ca))
 
 
 # Takes the given command line input and reads it, modifies it and passes it to scanner
