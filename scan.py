@@ -47,7 +47,7 @@ class Scanner:
         json_out = json.dumps(self.output, sort_keys=True, indent=4)
         print(json_out)
 
-        with open("output.json", "w") as outfile:
+        with open("scan_out.json", "w") as outfile:
             outfile.write(json_out)
 
     def add_scan_time(self):  # Acts to initialize the dictionary, with sites as keys and dict with scan time as value
