@@ -322,6 +322,7 @@ class Scanner:
     def get_rdns_names(self):
         for site in self.websites:
             print("\nAttempting to get rdns names for... " + site + "\n")
+            rdns_key = "rdns_names:"
             rdns_list = []
             site_dict = self.output.get(site)
             ip4_addr = site_dict.get("ipv4_addresses")
@@ -358,7 +359,7 @@ class Scanner:
 
                 print(rdns_list)
 
-        pass
+                site_dict.update({rdns_key: rdns_list})
 
 
 # Takes the given command line input and reads it, modifies it and passes it to scanner
