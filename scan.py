@@ -30,6 +30,8 @@ class Scanner:
     def scan(self):
         self.add_scan_time()
         print("\n\nADDED SCAN_TIME\n\n")
+        self.get_root_ca()
+        print("\n\nADDED ROOT CA\n\n")
         self.add_tls()
         print("\n\nADDED TLS\n\n")
         self.add_server()
@@ -38,9 +40,6 @@ class Scanner:
         print("\n\nADDED IP6\n\n")
         self.add_ip4()
         print("\n\nADDED ADDED IP4\n\n")
-
-
-
 
         json_dict = json.dumps(self.output, sort_keys=True, indent=4)
         print(json_dict)
@@ -223,7 +222,6 @@ class Scanner:
         return False
 
     # Uses nmap for each website
-    # TODO: check for an error in nmap result
     def add_tls(self):
         tls_key = "tls_versions"
         possible_tls = ["SSLv2:", "SSLv3:", "TLSv1.0:", "TLSv1.1:", "TLSv1.2:", "TLSv1.3"]
@@ -234,13 +232,13 @@ class Scanner:
             site_dict = self.output.get(site)
 
             # First checking for the first 3 versions of tls
-            print("Getting nmap result")
+            #print("Getting nmap result")
             try:
                 nmap_result = subprocess.check_output(nmap_request, timeout=20, stderr=subprocess.STDOUT).decode("utf-8")
             except Exception:
                 nmap_result = "Error\n"
             nmap_result = nmap_result.splitlines()
-            print("Going through nmap result")
+            #print("Going through nmap result")
             for line in nmap_result:
                 line = line.strip("| ")
                 #print(line)
@@ -250,28 +248,48 @@ class Scanner:
                         #print("Added TLS version to output list")
 
             # Second, check for TLSv1.3
-            print("Now checking for TLSv1.3 for: " + site)
+            #print("Now checking for TLSv1.3 for: " + site)
             #print(ssl_request)
             try:
                 ps = subprocess.Popen(["echo"], stdout=subprocess.PIPE)
-                ssl_result = subprocess.check_output(ssl_request, stdin=ps.stdout, timeout=20, stderr=subprocess.STDOUT).decode("utf-8")
+                ssl_result = subprocess.check_output(ssl_request, stdin=ps.stdout, timeout=10, stderr=subprocess.STDOUT).decode("utf-8")
                 ps.wait()
             except Exception:
-                print(Exception.__cause__)
+                #print(Exception.__cause__)
                 ssl_result = "Error\n"
-            print("Going through ssl_result: " + ssl_result)
+            #print("Going through ssl_result: " + ssl_result)
             ssl_result = ssl_result.splitlines()
             for line in ssl_result:
                 line = line.strip()
-                print("Current line: " + line + "\n")
+                #print("Current line: " + line + "\n")
                 if line[:12] == "New, TLSv1.3":
                     if "TLSv1.3" not in tls_list:
                         tls_list.append("TLSv1.3")
-                        print("Appending TLSv1.3 for: " + site)
+                        #print("Appending TLSv1.3 for: " + site)
                         break
 
-            print("\nUpdating site dictionary for " + site + "\n")
+            #print("\nUpdating site dictionary for " + site + "\n")
             site_dict.update({tls_key: tls_list})
+
+    def get_root_ca(self):
+        for site in self.websites:
+            print("\nGetting root CA for: " + site + "\n")
+            site_dict = self.output.get(site)
+            ca_request = ["openssl", "s_client", "-connect", "stevetarzia.com:443"]
+            print("Attempting the ca_request command")
+            try:
+                ps = subprocess.Popen(["echo"], stdout=subprocess.PIPE)
+                ca_result = subprocess.check_output(ca_request, stdin=ps.stdout, timeout=10,
+                                                    stderr=subprocess.STDOUT).decode("utf-8")
+            except Exception:
+                print("Command request ERROR")
+                ca_result ="Error"
+            if ca_result != "Error":
+                ca_result = ca_result.splitlines()
+                print(ca_result[8])
+
+
+        pass
 
 
 # Takes the given command line input and reads it, modifies it and passes it to scanner
