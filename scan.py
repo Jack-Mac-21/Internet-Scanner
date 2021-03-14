@@ -44,8 +44,11 @@ class Scanner:
         print("\n\nADDED IP6\n\n")
 
 
-        json_dict = json.dumps(self.output, sort_keys=True, indent=4)
-        print(json_dict)
+        json_out = json.dumps(self.output, sort_keys=True, indent=4)
+        print(json_out)
+
+        with open("output.json", "w") as outfile:
+            outfile.write(json_out)
 
     def add_scan_time(self):  # Acts to initialize the dictionary, with sites as keys and dict with scan time as value
         for site in self.websites:
@@ -321,45 +324,48 @@ class Scanner:
     #Gets reverse dns names by looping through the ip4 addresses for each site
     def get_rdns_names(self):
         for site in self.websites:
-            print("\nAttempting to get rdns names for... " + site + "\n")
+            #print("\nAttempting to get rdns names for... " + site + "\n")
             rdns_key = "rdns_names:"
             rdns_list = []
             site_dict = self.output.get(site)
             ip4_addr = site_dict.get("ipv4_addresses")
             for addi in ip4_addr:
                 nsl_request = ["nslookup", "-type=PTR", addi]
-                print(nsl_request)
-                print("Trying to nslookup for " + addi)
+                #print(nsl_request)
+                #print("Trying to nslookup for " + addi)
                 try:
                     nsl_response = subprocess.check_output(nsl_request, timeout=10,
                                                            stderr=subprocess.STDOUT).decode("utf-8")
                 except:
                     nsl_response = "Error"
-                    print("nsl_response ERROR")
-                print("\n" + nsl_response)
+                    #print("nsl_response ERROR")
+                #print("\n" + nsl_response)
                 if nsl_response != "Error":
                     answers = []
                     nsl_response = nsl_response.splitlines()
-                    print("parsing result")
+                    #print("parsing result")
                     if nsl_response[3] == "Non-authoritative answer:":
                         i = 4
                         while len(nsl_response[i]) != 0:
                             answers.append(nsl_response[i])
                             i += 1
-                            print("Adding answer line")
-                        print("All Answers found below...")
-                        print(answers)
+                            #print("Adding answer line")
+                        #print("All Answers found below...")
+                        #print(answers)
                         for answer in answers:
                             spliced_answer = answer.split("name = ")
                             rdns = spliced_answer[1]
                             rdns = rdns[:-1]
                             if rdns not in rdns_list:
-                                print("Appending to rdns list: " + rdns)
+                                #print("Appending to rdns list: " + rdns)
                                 rdns_list.append(rdns)
 
-                print(rdns_list)
+                #print(rdns_list)
 
                 site_dict.update({rdns_key: rdns_list})
+
+    def add_rtt(self):
+        pass
 
 
 # Takes the given command line input and reads it, modifies it and passes it to scanner
