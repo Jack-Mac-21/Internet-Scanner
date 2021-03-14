@@ -277,7 +277,7 @@ class Scanner:
             site_dict = self.output.get(site)
             certificate_chain = []
             root_ca = None
-            ca_request = ["openssl", "s_client", "-connect", "stevetarzia.com:443"]
+            ca_request = ["openssl", "s_client", "-connect", site + ":443"]
             print("Attempting the ca_request command")
             try:
                 ps = subprocess.Popen(["echo"], stdout=subprocess.PIPE)
@@ -298,6 +298,7 @@ class Scanner:
                 print(cc_last_line)
                 for entry in cc_last_line:
                     print(entry[:6])
+                    print("i:o = ")
                     if entry[:6] == "i:o = ":
                         root_ca = entry[6:]
                         print("Found root CA")
