@@ -299,8 +299,8 @@ class Scanner:
                 print(cc_last_line)
                 for entry in cc_last_line:
                     print("\n" + entry[:6])
-                    print("i:0 = ")
-                    if entry[:6] == "i:0 = ":
+                    print("i:O = ")
+                    if entry[:6] == "i:O = ":
                         root_ca = entry[6:]
                         print("Found root CA")
                         break
