@@ -312,6 +312,8 @@ class Scanner:
                         break
                 print("Root CA for " + site + ": " + str(root_ca))
 
+            site_dict.update({"root ca:": root_ca})
+
 
 # Takes the given command line input and reads it, modifies it and passes it to scanner
 def parse_input():
