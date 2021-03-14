@@ -292,8 +292,9 @@ class Scanner:
                     print("constructing Certificate chain for... " + site)
                     certificate_chain.append(ca_result[i])
                     i += 1
+                certificate_chain = [line.strip() for line in certificate_chain]
                 for line in certificate_chain:
-                    line.strip()
+                    line = line.strip()
                 print(certificate_chain)
 
 
