@@ -305,6 +305,7 @@ class Scanner:
                         print("Found root CA")
                         break
                     print(entry[:3])
+                    print("O = ")
                     if entry[:3] == "O = ":
                         root_ca = entry[3:]
                         print("Found Root CA")
