@@ -30,6 +30,10 @@ class Scanner:
     def scan(self):
         self.add_scan_time()
         print("\n\nADDED SCAN_TIME\n\n")
+        self.add_ip4()
+        print("\n\nADDED ADDED IP4\n\n")
+        self.get_rdns_names()
+        print("\n\nADDED RDNS NAMES\n\n")
         self.get_root_ca()
         print("\n\nADDED ROOT CA\n\n")
         self.add_tls()
@@ -38,8 +42,7 @@ class Scanner:
         print("\n\nADDED HTTP HEADERS\n\n")
         self.add_ip6()
         print("\n\nADDED IP6\n\n")
-        self.add_ip4()
-        print("\n\nADDED ADDED IP4\n\n")
+
 
         json_dict = json.dumps(self.output, sort_keys=True, indent=4)
         print(json_dict)
@@ -201,7 +204,7 @@ class Scanner:
             else:
                 try:
                     #print("Trying a redirect")
-                    curl_result = subprocess.check_output(["curl", "-I", location_redirect], timeout=1,
+                    curl_result = subprocess.check_output(["curl", "-I", location_redirect], timeout=2,
                                                               stderr=subprocess.STDOUT).decode("utf-8")
                     curl_result = curl_result.splitlines()
                 except Exception:
@@ -273,47 +276,87 @@ class Scanner:
 
     def get_root_ca(self):
         for site in self.websites:
-            print("\nGetting root CA for: " + site + "\n")
+            #print("\nGetting root CA for: " + site + "\n")
             site_dict = self.output.get(site)
             certificate_chain = []
             root_ca = None
             ca_request = ["openssl", "s_client", "-connect", site + ":443"]
-            print("Attempting the ca_request command")
+            #print("Attempting the ca_request command")
             try:
                 ps = subprocess.Popen(["echo"], stdout=subprocess.PIPE)
                 ca_result = subprocess.check_output(ca_request, stdin=ps.stdout, timeout=10,
                                                     stderr=subprocess.STDOUT).decode("utf-8")
             except Exception:
-                print("Command request ERROR")
+                #print("Command request ERROR")
                 ca_result ="Error"
             if ca_result != "Error":
                 i = 8
                 ca_result = ca_result.splitlines()
                 while ca_result[i] != "---":
-                    print("constructing Certificate chain for... " + site)
+                    #print("constructing Certificate chain for... " + site)
                     certificate_chain.append(ca_result[i])
                     i += 1
                 certificate_chain = [line.strip() for line in certificate_chain]
                 cc_last_line = certificate_chain[-1].split(",")
                 cc_last_line = [line.strip() for line in cc_last_line]
-                print(cc_last_line)
+                #print(cc_last_line)
                 for entry in cc_last_line:
-                    print("\n" + entry[:6])
-                    print("i:O = ")
+                    #print("\n" + entry[:6])
+                    #print("i:O = ")
                     if entry[:6] == "i:O = ":
                         root_ca = entry[6:]
-                        print("Found root CA")
+                        #print("Found root CA")
                         break
-                    print("\n" + entry[:3])
-                    print("O ")
+                    #print("\n" + entry[:3])
+                    #print("O ")
                     if entry[:2] == "O ":
                         root_ca = entry[3:]
-                        print("Found Root CA")
+                        #print("Found Root CA")
                         break
-                print("Root CA for " + site + ": " + str(root_ca))
+                #print("Root CA for " + site + ": " + str(root_ca))
             if root_ca is not None:
                 root_ca = root_ca.strip()
             site_dict.update({"root ca:": root_ca})
+
+    #Gets reverse dns names by looping through the ip4 addresses for each site
+    def get_rdns_names(self):
+        for site in self.websites:
+            print("\nAttempting to get rdns names for... " + site + "\n")
+            rdns_list = []
+            site_dict = self.output.get(site)
+            ip4_addr = site_dict.get("ipv4_addresses")
+            for addi in ip4_addr:
+                nsl_request = ["nslookup", "-type=PTR", addi]
+                print(nsl_request)
+                print("Trying to nslookup for " + addi)
+                try:
+                    nsl_response = subprocess.check_output(nsl_request, timeout=10,
+                                                           stderr=subprocess.STDOUT).decode("utf-8")
+                except:
+                    nsl_response = "Error"
+                    print("nsl_response ERROR")
+                print("\n" + nsl_response)
+                if nsl_response != "Error":
+                    answers = []
+                    nsl_response = nsl_response.splitlines()
+                    print("parsing result")
+                    if nsl_response[3] == "Non-authoritive answer:":
+                        i = 4
+                        while len(nsl_response[i]) != 0:
+                            answers.append(nsl_response[i])
+                            i += 1
+                            print("Adding answer line")
+                        print(answers)
+                        for answer in answers:
+                            spliced_answer = answer.split("name = ")
+                            rdns = spliced_answer[:-1]
+                            if rdns not in rdns_list:
+                                print("Appending to rdns list: " + rdns)
+                                rdns_list.append(rdns)
+
+                print(rdns_list)
+
+        pass
 
 
 # Takes the given command line input and reads it, modifies it and passes it to scanner
