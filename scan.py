@@ -340,7 +340,7 @@ class Scanner:
                     answers = []
                     nsl_response = nsl_response.splitlines()
                     print("parsing result")
-                    if nsl_response[3] == "Non-authoritive answer:":
+                    if nsl_response[3] == "Non-authoritative answer:":
                         i = 4
                         while len(nsl_response[i]) != 0:
                             answers.append(nsl_response[i])
