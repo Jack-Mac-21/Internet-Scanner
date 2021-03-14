@@ -346,10 +346,12 @@ class Scanner:
                             answers.append(nsl_response[i])
                             i += 1
                             print("Adding answer line")
+                        print("All Answers found below...")
                         print(answers)
                         for answer in answers:
                             spliced_answer = answer.split("name = ")
-                            rdns = spliced_answer[:-1]
+                            rdns = spliced_answer[1]
+                            rdns = rdns[:-1]
                             if rdns not in rdns_list:
                                 print("Appending to rdns list: " + rdns)
                                 rdns_list.append(rdns)
