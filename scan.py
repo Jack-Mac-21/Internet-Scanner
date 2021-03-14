@@ -311,7 +311,8 @@ class Scanner:
                         print("Found Root CA")
                         break
                 print("Root CA for " + site + ": " + str(root_ca))
-
+            if root_ca is not None:
+                root_ca = root_ca.strip()
             site_dict.update({"root ca:": root_ca})
 
 
