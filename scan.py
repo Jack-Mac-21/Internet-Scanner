@@ -276,6 +276,7 @@ class Scanner:
             print("\nGetting root CA for: " + site + "\n")
             site_dict = self.output.get(site)
             certificate_chain = []
+            root_ca = None
             ca_request = ["openssl", "s_client", "-connect", "stevetarzia.com:443"]
             print("Attempting the ca_request command")
             try:
@@ -293,9 +294,7 @@ class Scanner:
                     certificate_chain.append(ca_result[i])
                     i += 1
                 certificate_chain = [line.strip() for line in certificate_chain]
-                for line in certificate_chain:
-                    line = line.strip()
-                cc_last_line = certificate_chain[-1].splitlines()
+                cc_last_line = certificate_chain[-1].split(",")
                 print(cc_last_line)
                 for entry in cc_last_line:
                     if entry[:6] == "i:o = ":
