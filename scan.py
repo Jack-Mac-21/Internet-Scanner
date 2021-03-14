@@ -275,6 +275,7 @@ class Scanner:
         for site in self.websites:
             print("\nGetting root CA for: " + site + "\n")
             site_dict = self.output.get(site)
+            certificate_chain = []
             ca_request = ["openssl", "s_client", "-connect", "stevetarzia.com:443"]
             print("Attempting the ca_request command")
             try:
@@ -285,11 +286,13 @@ class Scanner:
                 print("Command request ERROR")
                 ca_result ="Error"
             if ca_result != "Error":
+                i = 8
                 ca_result = ca_result.splitlines()
-                print(ca_result[8])
-
-
-        pass
+                while ca_result[i] != "---":
+                    print("constructing Certificate chain for... " + site)
+                    certificate_chain.append(ca_result[i])
+                    i += 1
+                print(certificate_chain)
 
 
 # Takes the given command line input and reads it, modifies it and passes it to scanner
