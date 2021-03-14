@@ -295,6 +295,7 @@ class Scanner:
                     i += 1
                 certificate_chain = [line.strip() for line in certificate_chain]
                 cc_last_line = certificate_chain[-1].split(",")
+                cc_last_line = [line.strip() for line in cc_last_line]
                 print(cc_last_line)
                 for entry in cc_last_line:
                     print(entry[:6])
