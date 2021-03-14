@@ -297,10 +297,12 @@ class Scanner:
                 cc_last_line = certificate_chain[-1].split(",")
                 print(cc_last_line)
                 for entry in cc_last_line:
+                    print(entry[:6])
                     if entry[:6] == "i:o = ":
                         root_ca = entry[6:]
                         print("Found root CA")
                         break
+                    print(entry[:3])
                     if entry[:3] == "O = ":
                         root_ca = entry[3:]
                         print("Found Root CA")
