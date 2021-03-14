@@ -298,13 +298,13 @@ class Scanner:
                 cc_last_line = [line.strip() for line in cc_last_line]
                 print(cc_last_line)
                 for entry in cc_last_line:
-                    print(entry[:6])
-                    print("i:o = ")
-                    if entry[:6] == "i:o = ":
+                    print("\n" + entry[:6])
+                    print("i:0 = ")
+                    if entry[:6] == "i:0 = ":
                         root_ca = entry[6:]
                         print("Found root CA")
                         break
-                    print(entry[:3])
+                    print("\n" + entry[:3])
                     print("O = ")
                     if entry[:3] == "O = ":
                         root_ca = entry[3:]
