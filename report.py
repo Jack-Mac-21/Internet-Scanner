@@ -23,10 +23,12 @@ class ReportGenerator:
         self.fill_all_info_table()
         self.fill_ca_table()
         self.fill_server_table()
+        self.fill_tls_table()
 
         print(self.all_info_table.draw())
         print(self.root_ca_table.draw())
         print(self.server_table.draw())
+        print(self.tls_table.draw())
         with open("report_out.txt", "w") as outfile:
             outfile.write(self.all_info_table.draw() + "\n\n"
                           + self.root_ca_table.draw() + "\n\n"
@@ -135,10 +137,67 @@ class ReportGenerator:
             count_list[max_index] = 0
 
         return rearranged_server_list
-        pass
 
+    def fill_tls_table(self):
+        info_list = self.get_tls_info()
+        self.tls_table.add_row(["Protocol", "Count", "Percentage"])
 
+        for element in info_list:
+            self.tls_table.add_row(element)
 
+        self.tls_table.set_cols_width([5, 5, 5])
+
+    def get_tls_info(self):
+        total_sites = len(self.websites)
+        sslv2_count = 0
+        sslv3_count = 0
+        tlsv10_count = 0
+        tlsv11_count = 0
+        tlsv12_count = 0
+        tlsv13_count = 0
+        plain_http_count = 0
+        https_redirect_count = 0
+        hsts_count = 0
+        ipv6_count = 0
+
+        for site in self.websites:
+            site_dict = self.data.get(site)
+            if site_dict.get("insecure-http"):
+                plain_http_count += 1
+            if site_dict.get("redirect-to-https"):
+                https_redirect_count += 1
+            if site_dict.get("hsts"):
+                hsts_count += 1
+            if len(site_dict.get("ipv6_addresses")) > 0:
+                ipv6_count += 1
+            tls_list = site_dict.get("tls_versions")
+            for tls in tls_list:
+                if tls == "SSLv2":
+                    sslv2_count += 1
+                if tls == "SSLv3":
+                    sslv3_count += 1
+                if tls == "TLSv1.0":
+                    tlsv10_count += 1
+                if tls == "TLSv1.1":
+                    tlsv11_count += 1
+                if tls == "TLSv1.2":
+                    tlsv12_count += 1
+                if tls == "TLSv1.3":
+                    tlsv13_count += 1
+
+        protocol_count_percent_list = [["SSLv2", sslv2_count], ["SSLv3", sslv3_count] , ["TLSv1.0", tlsv10_count],
+                                       ["TLSv1.1", tlsv11_count],
+                                       ["TLSv1.2",tlsv12_count], ["TLSv1.3", tlsv13_count], ["Insecure_http", plain_http_count],
+                                       ["https_redirect", https_redirect_count], ["hsts", hsts_count], ["IPv6", ipv6_count]]
+
+        p_c_p_list_final = []
+
+        for element in protocol_count_percent_list:
+            new_element = element
+            new_element.append(str(round(element[1]/total_sites * 100, 2)) + "%")
+            p_c_p_list_final.append(new_element)
+
+        return p_c_p_list_final
 
 
 def parse_input():
