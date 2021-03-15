@@ -105,6 +105,7 @@ class Scanner:
             self.output.update({site: site_dict})
         db.close()
 
+    # TODO: add in support for the three main ports 80, 443, 22
     def get_rtt(self):  # gets the round trip time for all ipv4 addresses and on each of these ports 80, 443, 22
         for site in self.websites:
             site_dict = self.output.get(site)
