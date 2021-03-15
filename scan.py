@@ -7,6 +7,7 @@ import subprocess
 import time
 import json
 import http.client
+import maxminddb
 
 # TODO: switch "server" to "http-server"
 # Scanner takes a list of websites
@@ -28,6 +29,8 @@ class Scanner:
     def scan(self):
         self.add_scan_time()
         print("\n\nADDED SCAN_TIME\n\n")
+        self.add_geo_locations()
+        print("\n\nADDED GEO_LOCATIONS\n\n")
         self.get_rtt()
         print("\n\nADDED RTT\n\n")
         self.add_ip4()
@@ -55,14 +58,14 @@ class Scanner:
             value = {"scan-time": time.time()}
             self.output.update({key: value})
 
+    def add_geo_locations(self):  # Uses the database in the working directory to find all locations for all IP addresses
+        websites = self.websites
+        reader = maxminddb.open_database('GeoLite2-City.mmdb')
+        result = reader.get('9.9.9.9')
+        print(result)
+        pass
+
     def get_rtt(self):  # gets the round trip time for all ipv4 addresses and on each of these ports 80, 443, 22
-        command = ["sh", "-c", "\"time", "echo", "-e", """'\\x1dclose\\x0d'""", "|",
-                   "telnet", "172.217.6.110", "443"]
-        print(command)
-
-        command_result = subprocess.check_output(command, timeout=5 , stderr=subprocess.STDOUT).decode("utf-8")
-
-        print(command_result)
         pass
 
     def add_ip4(self):  # adds the ip4 address to each sites dictionary
