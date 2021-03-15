@@ -69,7 +69,8 @@ class Scanner:
                 province_name = ""
                 country_name = ""
                 result_dict = db.get(addi)
-
+                print(result_dict)
+                print('\n')
                 print("Getting city_name")
                 city_dict = result_dict.get("city")
                 if city_dict is not None:
@@ -78,9 +79,9 @@ class Scanner:
                 print("City Name: " + city_name)
 
                 print("Getting province_name")
-                subdiv_dict = result_dict.get("subdivisions")
-                if subdiv_dict is not None:
-                    sub_names_dict = subdiv_dict.get("names")
+                subdiv_list = result_dict.get("subdivisions")
+                if subdiv_list is not None:
+                    sub_names_dict = subdiv_list[0].get("names")
                     province_name = sub_names_dict.get("en")
                 print("Subdivision name: " + province_name)
 
