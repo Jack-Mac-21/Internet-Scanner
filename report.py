@@ -21,10 +21,7 @@ class ReportGenerator:
         self.tls_table = texttable.Texttable()  # tls info table
         self.rtt_table = texttable.Texttable() # table that orders the round trip times from fastests to slowest
 
-
     def generate_report(self):
-        output = self.data
-
         self.fill_all_info_table()
         self.fill_ca_table()
         self.fill_server_table()
