@@ -1,2 +1,4 @@
 texttable
 maxminddb
+pip
+setuptools
