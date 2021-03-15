@@ -24,8 +24,6 @@ class ReportGenerator:
 
     def generate_report(self):
         output = self.data
-        sys.stderr.write(output.get("amazon.com"))
-        sys.stderr.write(self.websites)
 
         self.fill_all_info_table()
         self.fill_ca_table()
