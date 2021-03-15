@@ -65,9 +65,9 @@ class Scanner:
             site_dict = self.output.get(site)
             ip4_addresses = site_dict.get("ipv4_addresses")
             for addi in ip4_addresses:
-                city_name = None
-                province_name = None
-                country_name = None
+                city_name = ""
+                province_name = ""
+                country_name = ""
                 result_dict = db.get(addi)
 
                 print("Getting city_name")
