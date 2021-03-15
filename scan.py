@@ -7,9 +7,11 @@ import subprocess
 import time
 import json
 import http.client
-import maxminddb
+import socket
+# import maxminddb
 
-# TODO: switch "server" to "http-server"
+
+# TODO: uncomment maxminddb stuff
 # Scanner takes a list of websites
 class Scanner:
     def __init__(self, input_txt):
@@ -29,12 +31,12 @@ class Scanner:
     def scan(self):
         self.add_scan_time()
         print("\n\nADDED SCAN_TIME\n\n")
-        self.get_rtt()
-        print("\n\nADDED RTT\n\n")
         self.add_ip4()
         print("\n\nADDED ADDED IP4\n\n")
-        self.add_geo_locations()
-        print("\n\nADDED GEO_LOCATIONS\n\n")
+        self.get_rtt()
+        print("\n\nADDED RTT\n\n")
+        # self.add_geo_locations() TODO: uncomment this stuff
+        # print("\n\nADDED GEO_LOCATIONS\n\n")
         self.get_rdns_names()
         print("\n\nADDED RDNS NAMES\n\n")
         self.get_root_ca()
@@ -59,7 +61,8 @@ class Scanner:
             self.output.update({key: value})
 
     def add_geo_locations(self):  # Uses the database in the working directory to find all locations for all IP addresses
-        db = maxminddb.open_database('GeoLite2-City.mmdb')
+        # db = maxminddb.open_database('GeoLite2-City.mmdb') todo: uncomment this
+        db ={}  # todo: delete this line
         for site in self.websites:
             location_list = []
             site_dict = self.output.get(site)
@@ -103,7 +106,33 @@ class Scanner:
         db.close()
 
     def get_rtt(self):  # gets the round trip time for all ipv4 addresses and on each of these ports 80, 443, 22
-        pass
+        for site in self.websites:
+            site_dict = self.output.get(site)
+            print(site_dict)
+            shortest_time = float('inf')
+            longest_time = float('-inf')
+            ip_addresses = site_dict.get("ipv4_addresses")
+            print(ip_addresses)
+            for addi in ip_addresses:
+                print("Going through IP addresses")
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                s.settimeout(5)
+                original_time = time.time()
+                try:
+                    s.connect((addi, 80))
+                    s.settimeout(None)
+                    time_taken = time.time() - original_time
+                except Exception:
+                    time_taken = "Error"
+                print(time_taken)
+                if time_taken != "Error":
+                    if time_taken < shortest_time:
+                        shortest_time = time_taken
+                        print("New shortest time!")
+                    if time_taken > longest_time:
+                        longest_time = time_taken
+                        print("New longest time!")
+            site_dict.update({"rtt_range": [shortest_time, longest_time]})
 
     def add_ip4(self):  # adds the ip4 address to each sites dictionary
         for site in self.websites:
@@ -128,6 +157,7 @@ class Scanner:
                                 address_list.append(string)
 
             site_dict.update({key: address_list})
+            print(address_list)
             self.output.update({site: site_dict})
 
     def add_ip6(self):  # adds the ip6 address to each sites dictionary, identical to ip4 implementation
