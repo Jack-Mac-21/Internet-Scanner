@@ -108,9 +108,9 @@ class Scanner:
     def add_server(self):  # Uses curl to get an http response and records the server, also handles https redirect portion
         for site in self.websites:
             site_dict = self.output.get(site)
-            key_server = "server"
+            key_server = "http_server"
             key_http_insecure = "insecure-http"
-            key_https_redirect = "redirect-to-https:"
+            key_https_redirect = "redirect-to-https"
             key_hsts = "hsts"
             server_value = None
             http_unencrypted = False
@@ -317,7 +317,7 @@ class Scanner:
                 #print("Root CA for " + site + ": " + str(root_ca))
             if root_ca is not None:
                 root_ca = root_ca.strip()
-            site_dict.update({"root ca:": root_ca})
+            site_dict.update({"root_ca": root_ca})
 
     #Gets reverse dns names by looping through the ip4 addresses for each site
     def get_rdns_names(self):

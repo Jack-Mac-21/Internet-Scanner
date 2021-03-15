@@ -28,9 +28,9 @@ class ReportGenerator:
         for site in self.websites:
             site_dict = self.data.get(site)
             table_entry = [site, site_dict.get("scan-time"), site_dict.get("ipv4_addresses"),
-                           site_dict.get("ipv6_addresses"), site_dict.get("server"), site_dict.get("insecure-http"),
-                           site_dict.get("redirect-to-https:"), site_dict.get("hsts"), site_dict.get("tls_versions"),
-                           site_dict.get("root ca"), site_dict.get("rdns_names:")]
+                           site_dict.get("ipv6_addresses"), site_dict.get("http_server"), site_dict.get("insecure-http"),
+                           site_dict.get("redirect-to-https"), site_dict.get("hsts"), site_dict.get("tls_versions"),
+                           site_dict.get("root_ca"), site_dict.get("rdns_names:")]
             rows.append(table_entry)
             self.table.add_row(table_entry)
         self.table.set_cols_width([12, 12, 20, 30, 10, 5, 5, 5, 10, 5, 30])
