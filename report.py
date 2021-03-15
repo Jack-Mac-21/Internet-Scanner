@@ -87,7 +87,7 @@ class ReportGenerator:
         for element in root_count:
             row_entry = [element[0], element[1]]
             self.root_ca_table.add_row(row_entry)
-        self.root_ca_table.set_cols_width([10, 10])
+        self.root_ca_table.set_cols_width([20, 10])
 
     # Helper for constructing the root_ca table, returns [[root, count]...]
     def get_root_count(self):
@@ -129,7 +129,7 @@ class ReportGenerator:
         for element in server_count:
             row_entry = [element[0], element[1]]
             self.server_table.add_row(row_entry)
-        self.server_table.set_cols_width([10, 10])
+        self.server_table.set_cols_width([20, 10])
 
     # Gets a list of list where elements are [server, count] and places in order
     def get_server_count(self):
@@ -169,7 +169,7 @@ class ReportGenerator:
         for element in info_list:
             self.tls_table.add_row(element)
 
-        self.tls_table.set_cols_width([10, 5, 17])
+        self.tls_table.set_cols_width([18, 5, 16])
 
     def get_tls_info(self):
         total_sites = len(self.websites)
