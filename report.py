@@ -33,7 +33,7 @@ class ReportGenerator:
             outfile.write(self.all_info_table.draw() + "\n\n"
                           + self.root_ca_table.draw() + "\n\n"
                           + self.server_table.draw() + "\n\n"
-                          + self.fill_tls_table().draw() + "\n\n")
+                          + self.tls_table.draw() + "\n\n")
 
 
     def fill_all_info_table(self):
