@@ -110,7 +110,7 @@ class Scanner:
         for site in self.websites:
             site_dict = self.output.get(site)
             # print(site_dict)
-            sys.stderr.write(str(i) + " Working on RTT" + site)
+            sys.stderr.write(str(i) + " Working on RTT" + site + "\n")
             shortest_time = float('inf')
             longest_time = float('-inf')
             ip_addresses = site_dict.get("ipv4_addresses")
