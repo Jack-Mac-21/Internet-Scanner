@@ -61,7 +61,7 @@ class Scanner:
             self.output.update({key: value})
 
     def add_geo_locations(self):  # Uses the database in the working directory to find all locations for all IP addresses
-        db = maxminddb.open_database('GeoLite2-City.mmdb') todo: uncomment this
+        db = maxminddb.open_database('GeoLite2-City.mmdb')
         for site in self.websites:
             location_list = []
             site_dict = self.output.get(site)
