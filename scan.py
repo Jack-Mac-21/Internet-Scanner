@@ -8,7 +8,7 @@ import time
 import json
 import http.client
 
-
+# TODO: switch "server" to "http-server"
 # Scanner takes a list of websites
 class Scanner:
     def __init__(self, input_txt):
