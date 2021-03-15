@@ -145,7 +145,7 @@ class ReportGenerator:
         for element in info_list:
             self.tls_table.add_row(element)
 
-        self.tls_table.set_cols_width([5, 5, 5])
+        self.tls_table.set_cols_width([5, 5, 7])
 
     def get_tls_info(self):
         total_sites = len(self.websites)
