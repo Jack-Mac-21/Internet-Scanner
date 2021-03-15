@@ -70,11 +70,9 @@ class ReportGenerator:
             site_dict = self.data.get(site)
             rtt_data = site_dict.get("rtt_range")
             entry = [site, rtt_data[0], rtt_data[1]]
-            sys.stderr.write(entry)
             site_rtt.append(entry)
 
         site_rtt.sort(key=sortSecond)
-        sys.stderr.write(site_rtt)
         return site_rtt
 
     def fill_ca_table(self):
