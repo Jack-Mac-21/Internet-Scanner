@@ -65,38 +65,38 @@ class Scanner:
             site_dict = self.output.get(site)
             ip4_addresses = site_dict.get("ipv4_addresses")
             for addi in ip4_addresses:
-                city_name = "Not found"
-                province_name = "Not found"
-                country_name = "Not found"
+                city_name = "City not found"
+                province_name = "Province not found"
+                country_name = "Country not found"
                 result_dict = db.get(addi)
-                print(result_dict)
-                print('\n')
-                print("Getting city_name")
+                # print(result_dict)
+                # print('\n')
+                # print("Getting city_name")
                 city_dict = result_dict.get("city")
                 if city_dict is not None:
                     name_dict = city_dict.get('names')
                     city_name = name_dict.get("en")
-                print("City Name: " + city_name)
+                # print("City Name: " + city_name)
 
-                print("Getting province_name")
+                # print("Getting province_name")
                 subdiv_list = result_dict.get("subdivisions")
                 if subdiv_list is not None:
                     sub_names_dict = subdiv_list[0].get("names")
                     province_name = sub_names_dict.get("en")
-                print("Subdivision name: " + province_name)
+                # print("Subdivision name: " + province_name)
 
-                print("Getting country_name")
+                # print("Getting country_name")
                 country_dict = result_dict.get("country")
                 if country_dict is not None:
                     country_names_dict = country_dict.get("names")
                     country_name = country_names_dict.get("en")
-                print("Country Name: " + country_name)
+                # print("Country Name: " + country_name)
 
                 loc = city_name + ", " + province_name + ", " + country_name
                 if loc not in location_list:
                     location_list.append(loc)
-                    print("Appending location...")
-                    print(loc)
+                    # print("Appending location...")
+                    # print(loc)
 
             site_dict.update({"geo_locations": location_list})
             self.output.update({site: site_dict})
