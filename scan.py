@@ -65,9 +65,9 @@ class Scanner:
             site_dict = self.output.get(site)
             ip4_addresses = site_dict.get("ipv4_addresses")
             for addi in ip4_addresses:
-                city_name = ""
-                province_name = ""
-                country_name = ""
+                city_name = "Not found"
+                province_name = "Not found"
+                country_name = "Not found"
                 result_dict = db.get(addi)
                 print(result_dict)
                 print('\n')
@@ -99,6 +99,7 @@ class Scanner:
                     print(loc)
 
             site_dict.update({"geo_locations": location_list})
+            self.output.update({site: site_dict})
         db.close()
 
     def get_rtt(self):  # gets the round trip time for all ipv4 addresses and on each of these ports 80, 443, 22
