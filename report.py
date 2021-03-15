@@ -32,7 +32,8 @@ class ReportGenerator:
         with open("report_out.txt", "w") as outfile:
             outfile.write(self.all_info_table.draw() + "\n\n"
                           + self.root_ca_table.draw() + "\n\n"
-                          + self.server_table.draw() + "\n\n")
+                          + self.server_table.draw() + "\n\n"
+                          + self.fill_tls_table().draw() + "\n\n")
 
 
     def fill_all_info_table(self):
@@ -145,7 +146,7 @@ class ReportGenerator:
         for element in info_list:
             self.tls_table.add_row(element)
 
-        self.tls_table.set_cols_width([5, 5, 7])
+        self.tls_table.set_cols_width([10, 5, 7])
 
     def get_tls_info(self):
         total_sites = len(self.websites)
