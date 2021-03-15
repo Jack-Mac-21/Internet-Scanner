@@ -39,17 +39,18 @@ class ReportGenerator:
     def fill_all_info_table(self):
         self.all_info_table.add_row(["Website", "Scan-Time", "IPv4 Addresses", "IPv6 Addresses",
                             "HTTP Server", "Insecure HTTP", "Redirect to HTTPS?", "HSTS?",
-                            "TLS Versions", "Root CA", "RDNS Names", "Geo-Locations"])
+                            "TLS Versions", "Root CA", "RDNS Names","RTT (milliseconds)", "Geo-Locations"])
         rows = []
         for site in self.websites:
             site_dict = self.data.get(site)
             table_entry = [site, site_dict.get("scan-time"), site_dict.get("ipv4_addresses"),
                            site_dict.get("ipv6_addresses"), site_dict.get("http_server"), site_dict.get("insecure-http"),
                            site_dict.get("redirect-to-https"), site_dict.get("hsts"), site_dict.get("tls_versions"),
-                           site_dict.get("root_ca"), site_dict.get("rdns_names:"), site_dict.get("geo_locations")]
+                           site_dict.get("root_ca"), site_dict.get("rdns_names:"), site_dict.get("rtt_range"),
+                           site_dict.get("geo_locations")]
             rows.append(table_entry)
             self.all_info_table.add_row(table_entry)
-        self.all_info_table.set_cols_width([12, 12, 20, 30, 10, 5, 5, 5, 10, 15, 30, 35])
+        self.all_info_table.set_cols_width([12, 12, 20, 30, 10, 5, 5, 5, 10, 15, 30, 20, 35])
 
     def fill_ca_table(self):
         root_count = self.get_root_count()

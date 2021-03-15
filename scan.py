@@ -8,7 +8,7 @@ import time
 import json
 import http.client
 import socket
-# import maxminddb
+import maxminddb
 
 
 # TODO: uncomment maxminddb stuff
@@ -35,8 +35,8 @@ class Scanner:
         print("\n\nADDED ADDED IP4\n\n")
         self.get_rtt()
         print("\n\nADDED RTT\n\n")
-        # self.add_geo_locations() TODO: uncomment this stuff
-        # print("\n\nADDED GEO_LOCATIONS\n\n")
+        self.add_geo_locations()
+        print("\n\nADDED GEO_LOCATIONS\n\n")
         self.get_rdns_names()
         print("\n\nADDED RDNS NAMES\n\n")
         self.get_root_ca()
@@ -61,8 +61,7 @@ class Scanner:
             self.output.update({key: value})
 
     def add_geo_locations(self):  # Uses the database in the working directory to find all locations for all IP addresses
-        # db = maxminddb.open_database('GeoLite2-City.mmdb') todo: uncomment this
-        db ={}  # todo: delete this line
+        db = maxminddb.open_database('GeoLite2-City.mmdb') todo: uncomment this
         for site in self.websites:
             location_list = []
             site_dict = self.output.get(site)
@@ -105,18 +104,17 @@ class Scanner:
             self.output.update({site: site_dict})
         db.close()
 
-    # TODO: add in support for the three main ports 80, 443, 22
     def get_rtt(self):  # gets the round trip time for all ipv4 addresses and on each of these ports 80, 443, 22
         ports = [80, 443, 22]
         for site in self.websites:
             site_dict = self.output.get(site)
-            print(site_dict)
+            # print(site_dict)
             shortest_time = float('inf')
             longest_time = float('-inf')
             ip_addresses = site_dict.get("ipv4_addresses")
-            print(ip_addresses)
+            # print(ip_addresses)
             for addi in ip_addresses:
-                print("Going through IP addresses")
+                # print("Going through IP addresses")
                 for port in ports:
                     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                     s.settimeout(5)
@@ -127,14 +125,14 @@ class Scanner:
                         time_taken = time.time() - original_time
                     except Exception:
                         time_taken = "Error"
-                    print(time_taken)
+                    # print(time_taken)
                     if time_taken != "Error":
                         if time_taken < shortest_time:
                             shortest_time = time_taken
-                            print("New shortest time!")
+                            # print("New shortest time!")
                         if time_taken > longest_time:
                             longest_time = time_taken
-                            print("New longest time!")
+                            # print("New longest time!")
             if shortest_time == float('inf'):
                 shortest_time = None
             if longest_time == float('-inf'):
@@ -142,8 +140,8 @@ class Scanner:
             if shortest_time is not None and longest_time is not None:
                 shortest_time *= 1000
                 longest_time *= 1000
-                round(shortest_time, 4)
-                round(longest_time, 4)
+                shortest_time = round(shortest_time, 4)
+                longest_time = round(longest_time, 4)
             site_dict.update({"rtt_range": [shortest_time, longest_time]})
 
     def add_ip4(self):  # adds the ip4 address to each sites dictionary
