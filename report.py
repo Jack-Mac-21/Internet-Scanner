@@ -18,6 +18,8 @@ class ReportGenerator:
         self.text_table()
 
         print(self.table.draw())
+        with open("report_out.txt", "w") as outfile:
+            outfile.write(self.table.draw())
 
     def text_table(self):
 
