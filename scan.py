@@ -135,6 +135,15 @@ class Scanner:
                         if time_taken > longest_time:
                             longest_time = time_taken
                             print("New longest time!")
+            if shortest_time == float('inf'):
+                shortest_time = None
+            if longest_time == float('-inf'):
+                longest_time = None
+            if shortest_time is not None and longest_time is not None:
+                shortest_time *= 1000
+                longest_time *= 1000
+                round(shortest_time, 4)
+                round(longest_time, 4)
             site_dict.update({"rtt_range": [shortest_time, longest_time]})
 
     def add_ip4(self):  # adds the ip4 address to each sites dictionary
