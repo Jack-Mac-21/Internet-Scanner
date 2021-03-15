@@ -61,8 +61,12 @@ class Scanner:
     def add_geo_locations(self):  # Uses the database in the working directory to find all locations for all IP addresses
         websites = self.websites
         reader = maxminddb.open_database('GeoLite2-City.mmdb')
-        result = reader.get('9.9.9.9')
-        print(result)
+        result_dict = reader.get('9.9.9.9')
+        city_dict = result_dict.get("city")
+        name_dict = city_dict.get("names")
+        name = name_dict.get("en")
+        reader.close()
+        print(name)
         pass
 
     def get_rtt(self):  # gets the round trip time for all ipv4 addresses and on each of these ports 80, 443, 22
