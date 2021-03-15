@@ -64,7 +64,7 @@ class ReportGenerator:
     def fill_rtt_table(self):
         rtt_info = self.get_rtt_table_info()
 
-        self.rtt_table.add_row(["Site", "RTT (milliseconds)"])
+        self.rtt_table.add_row(["Site", "Shortest RTT (msec)", "Longest RTT (msec)"])
         for element in rtt_info:
             self.rtt_table.add_row(element)
 
