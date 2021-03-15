@@ -22,12 +22,15 @@ class ReportGenerator:
 
         self.fill_all_info_table()
         self.fill_ca_table()
+        self.fill_server_table()
 
         print(self.all_info_table.draw())
         print(self.root_ca_table.draw())
+        print(self.server_table.draw())
         with open("report_out.txt", "w") as outfile:
             outfile.write(self.all_info_table.draw() + "\n\n"
-                          + self.root_ca_table.draw() + "\n\n")
+                          + self.root_ca_table.draw() + "\n\n"
+                          + self.server_table.draw() + "\n\n")
 
 
     def fill_all_info_table(self):
@@ -90,6 +93,50 @@ class ReportGenerator:
             count_list[max_index] = 0
 
         return rearranged_root_list
+
+    # Fills the server table with number of occurences and in order of each http-server
+    def fill_server_table(self):
+        server_count = self.get_server_count()
+
+        self.server_table.add_row(["HTTP-Server", "Count"])
+
+        for element in server_count:
+            row_entry = [element[0], element[1]]
+            self.server_table.add_row(row_entry)
+        self.server_table.set_cols_width([10, 10])
+
+    # Gets a list of list where elements are [server, count] and places in order
+    def get_server_count(self):
+        server_list = []  # all servers with repeats
+        server_count = []
+        for site in self.websites:
+            site_dict = self.data.get(site)
+            server_list.append(site_dict.get("http_server"))
+
+        server_set = set(server_list)
+
+        for serv in server_set:  # for the root_ca it checks through all roots CAs and counts the occurences
+            count = 0
+            for server in server_list:
+                if serv == server:
+                    count += 1
+            server_count.append([serv, count])
+
+        # Re-arranging the root count list
+        count_list = []  # List of just the counts
+        rearranged_server_list = []
+
+        for element in server_count:
+            count_list.append(element[1])
+
+        for element in server_count:
+            max_index = count_list.index(max(count_list))
+            rearranged_server_list.append(server_count[max_index])
+            count_list[max_index] = 0
+
+        return rearranged_server_list
+        pass
+
 
 
 
