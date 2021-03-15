@@ -167,7 +167,7 @@ class Scanner:
                                 address_list.append(string)
 
             site_dict.update({key: address_list})
-            print(address_list)
+            # print(address_list)
             self.output.update({site: site_dict})
 
     def add_ip6(self):  # adds the ip6 address to each sites dictionary, identical to ip4 implementation

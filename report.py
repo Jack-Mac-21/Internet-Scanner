@@ -13,6 +13,7 @@ class ReportGenerator:
         self.root_ca_table = texttable.Texttable()  # Order root_ca's from most popular and gives a count
         self.server_table = texttable.Texttable()  # Order http_server from most popular and give count
         self.tls_table = texttable.Texttable()  # tls info table
+        self.rtt_table = texttable.Texttable() # table that orders the round trip times from fastests to slowest
 
 
     def generate_report(self):
@@ -51,6 +52,9 @@ class ReportGenerator:
             rows.append(table_entry)
             self.all_info_table.add_row(table_entry)
         self.all_info_table.set_cols_width([12, 12, 20, 30, 10, 5, 5, 5, 10, 15, 30, 20, 35])
+
+    def fill_rtt_table(self):
+        pass
 
     def fill_ca_table(self):
         root_count = self.get_root_count()
