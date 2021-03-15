@@ -65,12 +65,16 @@ class Scanner:
             site_dict = self.output.get(site)
             ip4_addresses = site_dict.get("ipv4_addresses")
             for addi in ip4_addresses:
+                name = None
                 result_dict = db.get(addi)
                 city_dict = result_dict.get("city")
-                name_dict = city_dict.get("names")
-                name = name_dict.get("en")
-                if name not in location_list:
+                if city_dict is not None:
+                    name_dict = city_dict.get('names')
+                    name = name_dict.get("en")
+                print(name)
+                if name not in location_list and name is not None:
                     location_list.append(name)
+                    print("Appending: " + name)
 
             site_dict.update({"geo_locations": location_list})
         db.close()
