@@ -24,8 +24,8 @@ class ReportGenerator:
 
     def generate_report(self):
         output = self.data
-        print(output.get("amazon.com"))
-        print(self.websites)
+        sys.stderr.write(output.get("amazon.com"))
+        sys.stderr.write(self.websites)
 
         self.fill_all_info_table()
         self.fill_ca_table()
@@ -33,11 +33,11 @@ class ReportGenerator:
         self.fill_tls_table()
         self.fill_rtt_table()
 
-        print(self.all_info_table.draw())
-        print(self.root_ca_table.draw())
-        print(self.server_table.draw())
-        print(self.tls_table.draw())
-        print(self.rtt_table.draw())
+        sys.stderr.write(self.all_info_table.draw())
+        sys.stderr.write(self.root_ca_table.draw())
+        sys.stderr.write(self.server_table.draw())
+        sys.stderr.write(self.tls_table.draw())
+        sys.stderr.write(self.rtt_table.draw())
         with open("report_out.txt", "w") as outfile:
             outfile.write(self.all_info_table.draw() + "\n\n"
                           + self.root_ca_table.draw() + "\n\n"
@@ -71,15 +71,15 @@ class ReportGenerator:
     def get_rtt_table_info(self):
         site_rtt = []  # List that contains elements [site, shortest rtt, longest rtt]
         for site in self.websites:
-            print("Making entry for: " + site)
+            sys.stderr.write("Making entry for: " + site)
             site_dict = self.data.get(site)
             rtt_data = site_dict.get("rtt_range")
             entry = [site, rtt_data[0], rtt_data[1]]
-            print(entry)
+            sys.stderr.write(entry)
             site_rtt.append(entry)
 
         site_rtt.sort(key=sortSecond)
-        print(site_rtt)
+        sys.stderr.write(site_rtt)
         return site_rtt
 
     def fill_ca_table(self):
@@ -171,12 +171,12 @@ class ReportGenerator:
 
     def fill_tls_table(self):
         info_list = self.get_tls_info()
-        self.tls_table.add_row(["Protocol", "Count", "Percentage"])
+        self.tls_table.add_row(["Item", "Count", "Percentage Supported"])
 
         for element in info_list:
             self.tls_table.add_row(element)
 
-        self.tls_table.set_cols_width([10, 5, 7])
+        self.tls_table.set_cols_width([10, 5, 17])
 
     def get_tls_info(self):
         total_sites = len(self.websites)

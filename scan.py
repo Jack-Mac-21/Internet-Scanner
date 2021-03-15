@@ -30,26 +30,26 @@ class Scanner:
 
     def scan(self):
         self.add_scan_time()
-        print("\n\nADDED SCAN_TIME\n\n")
+        sys.stderr.write("\n\nADDED SCAN_TIME\n\n")
         self.add_ip4()
-        print("\n\nADDED ADDED IP4\n\n")
+        sys.stderr.write("\n\nADDED ADDED IP4\n\n")
         self.get_rtt()
-        print("\n\nADDED RTT\n\n")
+        sys.stderr.write("\n\nADDED RTT\n\n")
         self.add_geo_locations()
-        print("\n\nADDED GEO_LOCATIONS\n\n")
+        sys.stderr.write("\n\nADDED GEO_LOCATIONS\n\n")
         self.get_rdns_names()
-        print("\n\nADDED RDNS NAMES\n\n")
+        sys.stderr.write("\n\nADDED RDNS NAMES\n\n")
         self.get_root_ca()
-        print("\n\nADDED ROOT CA\n\n")
+        sys.stderr.write("\n\nADDED ROOT CA\n\n")
         self.add_tls()
-        print("\n\nADDED TLS\n\n")
+        sys.stderr.write("\n\nADDED TLS\n\n")
         self.add_server()
-        print("\n\nADDED HTTP HEADERS\n\n")
+        sys.stderr.write("\n\nADDED HTTP HEADERS\n\n")
         self.add_ip6()
-        print("\n\nADDED IP6\n\n")
+        sys.stderr.write("\n\nADDED IP6\n\n")
 
         json_out = json.dumps(self.output, sort_keys=True, indent=4)
-        print(json_out)
+        sys.stderr.write(json_out)
 
         with open("scan_out.json", "w") as outfile:
             outfile.write(json_out)
@@ -110,17 +110,17 @@ class Scanner:
         for site in self.websites:
             site_dict = self.output.get(site)
             # print(site_dict)
-            print(str(i) + " Working on " + site)
+            sys.stderr.write(str(i) + " Working on RTT" + site)
             shortest_time = float('inf')
             longest_time = float('-inf')
             ip_addresses = site_dict.get("ipv4_addresses")
             # print(ip_addresses)
             for addi in ip_addresses:
-                print("Going through IP " + addi)
+                # print("Going through IP " + addi)
                 for port in ports:
-                    print("Checking port # " + port)
+                    # print("Checking port # " + str(port))
                     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    s.settimeout(1.25)
+                    s.settimeout(3)
                     original_time = time.time()
                     try:
                         s.connect((addi, port))
@@ -410,7 +410,7 @@ class Scanner:
                         root_ca = entry[3:]
                         # print("Found Root CA")
                         break
-                #  print("Root CA for " + site + ": " + str(root_ca))
+                #sys.stderr.write("Root CA for " + site + ": " + str(root_ca))
             if root_ca is not None:
                 root_ca = root_ca.strip()
             site_dict.update({"root_ca": root_ca})
