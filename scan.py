@@ -28,6 +28,8 @@ class Scanner:
     def scan(self):
         self.add_scan_time()
         print("\n\nADDED SCAN_TIME\n\n")
+        self.get_rtt()
+        print("\n\nADDED RTT\n\n")
         self.add_ip4()
         print("\n\nADDED ADDED IP4\n\n")
         self.get_rdns_names()
