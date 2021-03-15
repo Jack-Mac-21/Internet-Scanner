@@ -109,6 +109,7 @@ class Scanner:
         for site in self.websites:
             site_dict = self.output.get(site)
             # print(site_dict)
+            print("Working on " + site)
             shortest_time = float('inf')
             longest_time = float('-inf')
             ip_addresses = site_dict.get("ipv4_addresses")
@@ -117,7 +118,7 @@ class Scanner:
                 # print("Going through IP addresses")
                 for port in ports:
                     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    s.settimeout(5)
+                    s.settimeout(3)
                     original_time = time.time()
                     try:
                         s.connect((addi, port))
