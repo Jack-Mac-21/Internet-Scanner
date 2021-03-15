@@ -29,12 +29,12 @@ class Scanner:
     def scan(self):
         self.add_scan_time()
         print("\n\nADDED SCAN_TIME\n\n")
-        self.add_geo_locations()
-        print("\n\nADDED GEO_LOCATIONS\n\n")
         self.get_rtt()
         print("\n\nADDED RTT\n\n")
         self.add_ip4()
         print("\n\nADDED ADDED IP4\n\n")
+        self.add_geo_locations()
+        print("\n\nADDED GEO_LOCATIONS\n\n")
         self.get_rdns_names()
         print("\n\nADDED RDNS NAMES\n\n")
         self.get_root_ca()
@@ -59,15 +59,21 @@ class Scanner:
             self.output.update({key: value})
 
     def add_geo_locations(self):  # Uses the database in the working directory to find all locations for all IP addresses
-        websites = self.websites
-        reader = maxminddb.open_database('GeoLite2-City.mmdb')
-        result_dict = reader.get('9.9.9.9')
-        city_dict = result_dict.get("city")
-        name_dict = city_dict.get("names")
-        name = name_dict.get("en")
-        reader.close()
-        print(name)
-        pass
+        db = maxminddb.open_database('GeoLite2-City.mmdb')
+        for site in self.websites:
+            location_list = []
+            site_dict = self.output.get(site)
+            ip4_addresses = site_dict.get("ipv4_addresses")
+            for addi in ip4_addresses:
+                result_dict = db.get(addi)
+                city_dict = result_dict.get("city")
+                name_dict = city_dict.get("names")
+                name = name_dict.get("en")
+                if name not in location_list:
+                    location_list.append(name)
+
+            site_dict.update({"geo_locations": location_list})
+        db.close()
 
     def get_rtt(self):  # gets the round trip time for all ipv4 addresses and on each of these ports 80, 443, 22
         pass
