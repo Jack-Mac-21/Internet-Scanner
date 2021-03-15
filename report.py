@@ -4,6 +4,12 @@ import json
 import texttable
 
 
+def sortSecond(val):
+    if val[1] is None:
+        return float('inf')
+    else:
+        return val[1]
+
 # TODO: added RTT table after adding it's scanner
 class ReportGenerator:
     def __init__(self, input_json):
@@ -25,17 +31,19 @@ class ReportGenerator:
         self.fill_ca_table()
         self.fill_server_table()
         self.fill_tls_table()
+        self.fill_rtt_table()
 
         print(self.all_info_table.draw())
         print(self.root_ca_table.draw())
         print(self.server_table.draw())
         print(self.tls_table.draw())
+        print(self.rtt_table.draw())
         with open("report_out.txt", "w") as outfile:
             outfile.write(self.all_info_table.draw() + "\n\n"
                           + self.root_ca_table.draw() + "\n\n"
                           + self.server_table.draw() + "\n\n"
-                          + self.tls_table.draw() + "\n\n")
-
+                          + self.tls_table.draw() + "\n\n"
+                          + self.rtt_table.draw() + "\n\n")
 
     def fill_all_info_table(self):
         self.all_info_table.add_row(["Website", "Scan-Time", "IPv4 Addresses", "IPv6 Addresses",
@@ -54,7 +62,25 @@ class ReportGenerator:
         self.all_info_table.set_cols_width([12, 12, 20, 30, 10, 5, 5, 5, 10, 15, 30, 20, 35])
 
     def fill_rtt_table(self):
-        pass
+        rtt_info = self.get_rtt_table_info()
+
+        self.rtt_table.add_row(["Site", "RTT (milliseconds)"])
+        for element in rtt_info:
+            self.rtt_table.add_row(element)
+
+    def get_rtt_table_info(self):
+        site_rtt = []  # List that contains elements [site, shortest rtt, longest rtt]
+        for site in self.websites:
+            print("Making entry for: " + site)
+            site_dict = self.data.get(site)
+            rtt_data = site_dict.get("rtt_range")
+            entry = [site, rtt_data[0], rtt_data[1]]
+            print(entry)
+            site_rtt.append(entry)
+
+        site_rtt.sort(key=sortSecond)
+        print(site_rtt)
+        return site_rtt
 
     def fill_ca_table(self):
         root_count = self.get_root_count()
@@ -62,7 +88,6 @@ class ReportGenerator:
 
         for element in root_count:
             count_list.append(element[1])
-
 
         self.root_ca_table.add_row(["Root CA", "Count"])
 
