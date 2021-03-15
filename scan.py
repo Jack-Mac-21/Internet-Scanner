@@ -9,8 +9,6 @@ import json
 import http.client
 
 
-
-
 # Scanner takes a list of websites
 class Scanner:
     def __init__(self, input_txt):
