@@ -107,6 +107,7 @@ class Scanner:
 
     # TODO: add in support for the three main ports 80, 443, 22
     def get_rtt(self):  # gets the round trip time for all ipv4 addresses and on each of these ports 80, 443, 22
+        ports = [80, 443, 22]
         for site in self.websites:
             site_dict = self.output.get(site)
             print(site_dict)
@@ -116,23 +117,24 @@ class Scanner:
             print(ip_addresses)
             for addi in ip_addresses:
                 print("Going through IP addresses")
-                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                s.settimeout(5)
-                original_time = time.time()
-                try:
-                    s.connect((addi, 80))
-                    s.settimeout(None)
-                    time_taken = time.time() - original_time
-                except Exception:
-                    time_taken = "Error"
-                print(time_taken)
-                if time_taken != "Error":
-                    if time_taken < shortest_time:
-                        shortest_time = time_taken
-                        print("New shortest time!")
-                    if time_taken > longest_time:
-                        longest_time = time_taken
-                        print("New longest time!")
+                for port in ports:
+                    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    s.settimeout(5)
+                    original_time = time.time()
+                    try:
+                        s.connect((addi, port))
+                        s.settimeout(None)
+                        time_taken = time.time() - original_time
+                    except Exception:
+                        time_taken = "Error"
+                    print(time_taken)
+                    if time_taken != "Error":
+                        if time_taken < shortest_time:
+                            shortest_time = time_taken
+                            print("New shortest time!")
+                        if time_taken > longest_time:
+                            longest_time = time_taken
+                            print("New longest time!")
             site_dict.update({"rtt_range": [shortest_time, longest_time]})
 
     def add_ip4(self):  # adds the ip4 address to each sites dictionary
