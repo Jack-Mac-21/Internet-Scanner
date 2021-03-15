@@ -106,19 +106,21 @@ class Scanner:
 
     def get_rtt(self):  # gets the round trip time for all ipv4 addresses and on each of these ports 80, 443, 22
         ports = [80, 443, 22]
+        i = 0
         for site in self.websites:
             site_dict = self.output.get(site)
             # print(site_dict)
-            print("Working on " + site)
+            print(str(i) + " Working on " + site)
             shortest_time = float('inf')
             longest_time = float('-inf')
             ip_addresses = site_dict.get("ipv4_addresses")
             # print(ip_addresses)
             for addi in ip_addresses:
-                # print("Going through IP addresses")
+                print("Going through IP " + addi)
                 for port in ports:
+                    print("Checking port # " + port)
                     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    s.settimeout(3)
+                    s.settimeout(1.25)
                     original_time = time.time()
                     try:
                         s.connect((addi, port))
@@ -134,6 +136,7 @@ class Scanner:
                         if time_taken > longest_time:
                             longest_time = time_taken
                             # print("New longest time!")
+
             if shortest_time == float('inf'):
                 shortest_time = None
             if longest_time == float('-inf'):
@@ -144,6 +147,7 @@ class Scanner:
                 shortest_time = round(shortest_time, 4)
                 longest_time = round(longest_time, 4)
             site_dict.update({"rtt_range": [shortest_time, longest_time]})
+            i += 1
 
     def add_ip4(self):  # adds the ip4 address to each sites dictionary
         for site in self.websites:
