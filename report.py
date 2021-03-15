@@ -33,7 +33,7 @@ class ReportGenerator:
                            site_dict.get("root ca"), site_dict.get("rdns_names:")]
             rows.append(table_entry)
             self.table.add_row(table_entry)
-        self.table.set_cols_width([12, 12, 25, 25, 10, 5, 5, 5, 5, 5, 20])
+        self.table.set_cols_width([12, 12, 20, 30, 10, 5, 5, 5, 10, 5, 30])
 
         pass
 
